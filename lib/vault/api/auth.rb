@@ -145,6 +145,26 @@ module Vault
       return secret
     end
 
+
+    # Authenticate via the Kubernetes authentication method. If authentication is
+    # successful, the resulting token will be stored on the client and used
+    # for future requests.
+    #
+    # @example
+    #   Vault.auth.github("mypersonalgithubtoken") #=> #<Vault::Secret lease_id="">
+    #
+    # @param [String] jwt
+    # @param [String] role
+    #
+    # @return [Secret]
+    def kubernetes(jwt, role, path="/v1/auth/kubernetes/login")
+      payload = {jwt: jwt, role: role}
+      json = client.post(path, JSON.fast_generate(payload))
+      secret = Secret.decode(json)
+      client.token = secret.auth.client_token
+      return secret
+    end
+
     # Authenticate via the GitHub authentication method. If authentication is
     # successful, the resulting token will be stored on the client and used
     # for future requests.
